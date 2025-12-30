@@ -62,7 +62,8 @@
             <div id="slotsContainer" class="grid grid-cols-3 gap-2"></div>
 
             <section id="paymentSection" class="hidden space-y-4 pt-6 border-t border-teal-50 animate-fade text-center">
-                <input type="text" id="patientName" placeholder="Escribe tu nombre completo" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold">
+                <input type="text" id="patientName" placeholder="Tu nombre completo" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold mb-2">
+                <input type="tel" id="patientPhone" placeholder="WhatsApp (10 dígitos)" maxlength="10" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold">
                 
                 <div class="bg-teal-50 p-5 rounded-[2rem] border border-teal-100">
                     <p class="text-[10px] font-black text-teal-900 uppercase mb-4 tracking-tighter italic">Anticipo de Reserva: 50%</p>
@@ -109,7 +110,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // MANEJO DE INSTALACIÓN PWA
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -126,11 +126,9 @@
             }
         });
 
-        // RESTRICCIÓN DE FECHA MÍNIMA
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('datePicker').setAttribute('min', todayStr);
 
-        // CARGA DE HORARIOS DESDE FIREBASE
         document.getElementById('datePicker').addEventListener('change', async (e) => {
             const fecha = e.target.value;
             const configDoc = await getDoc(doc(db, "configuracion", fecha));
@@ -163,7 +161,6 @@
             });
         }
 
-        // FUNCIÓN DE COPIAR TEXTO
         window.copyText = (text, id) => {
             navigator.clipboard.writeText(text);
             const el = document.getElementById(id);
@@ -172,28 +169,31 @@
             setTimeout(() => el.innerText = originalText, 2000);
         };
 
-        // GUARDAR CITA Y ENVIAR WHATSAPP
         window.guardarYEnviar = async () => {
             const nombre = document.getElementById('patientName').value;
+            const telefono = document.getElementById('patientPhone').value;
             const fecha = document.getElementById('datePicker').value;
+
             if(!nombre) return alert("Por favor escribe tu nombre");
+            if(telefono.length !== 10) return alert("El teléfono debe ser de 10 dígitos");
             
             try {
+                // GUARDAMOS EL TELÉFONO EN LA NUBE
                 await addDoc(collection(db, "citas"), { 
                     nombre, 
+                    telefono: "52" + telefono, // Agregamos el código de país para WhatsApp
                     fecha, 
                     hora: window.selectedTime, 
                     pagado: false, 
                     creado: new Date() 
                 });
-                const msg = `Hola Dra. Gabriela, soy ${nombre}. Agendé mi cita en CAP para el ${fecha} a las ${window.selectedTime}. Adjunto comprobante del 50%.`;
+                const msg = `Hola Dra. Gabriela, soy ${nombre}. Agendé mi cita en CAP para el ${fecha} a las ${window.selectedTime}. Mi WhatsApp es ${telefono}. Adjunto comprobante.`;
                 window.open(`https://wa.me/523313111626?text=${encodeURIComponent(msg)}`, '_blank');
             } catch (e) {
-                alert("Error al guardar la cita. Intenta de nuevo.");
+                alert("Error al guardar la cita.");
             }
         };
 
-        // REGISTRO DEL SERVICE WORKER
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('service-worker.js');
