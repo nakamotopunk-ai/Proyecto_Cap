@@ -60,57 +60,54 @@
         let unsubscribeCitas = null;
 
         const dateInput = document.getElementById('adminDatePicker');
-        
-        // Ajuste para fecha local México (evita desfase de días)
         const ahora = new Date();
         const offset = ahora.getTimezoneOffset() * 60000;
         dateInput.value = new Date(ahora - offset).toISOString().split('T')[0];
 
         async function cargarDia(fecha) {
             const container = document.getElementById('citasContainer');
-            
-            // 1. Obtener configuración de horarios para ese día
             const configDoc = await getDoc(doc(db, "configuracion", fecha));
             horasSeleccionadas = configDoc.exists() ? configDoc.data().activos : [];
             renderAdminSlots();
 
-            // 2. Escuchar citas (Ordenadas localmente para evitar errores de conexión)
             if (unsubscribeCitas) unsubscribeCitas();
             const q = query(collection(db, "citas"), where("fecha", "==", fecha));
             
             unsubscribeCitas = onSnapshot(q, (snap) => {
                 container.innerHTML = '';
-                
                 if (snap.empty) {
                     container.innerHTML = '<div class="text-center py-10 text-slate-300 text-[10px] font-black uppercase italic">Sin citas agendadas</div>';
                     return;
                 }
                 
-                // Procesar y ordenar localmente por hora
                 const docs = [];
                 snap.forEach(d => docs.push({id: d.id, ...d.data()}));
                 docs.sort((a, b) => a.hora.localeCompare(b.hora));
 
                 docs.forEach(cita => {
-                    const waLink = `https://wa.me/523313111626?text=Hola ${encodeURIComponent(cita.nombre)}, te contacto de CAP sobre tu cita de las ${cita.hora}`;
+                    // Si la cita no tiene teléfono (citas viejas), usa el tuyo por seguridad
+                    const telDestino = cita.telefono || "523313111626"; 
+                    const waLink = `https://wa.me/${telDestino}?text=Hola ${encodeURIComponent(cita.nombre)}, le contacto de CAP sobre su cita de las ${cita.hora}`;
+                    
                     container.innerHTML += `
                         <div class="bg-white p-4 rounded-2xl border border-teal-100 flex justify-between items-center shadow-md mb-2">
                             <div>
                                 <p class="text-[8px] font-black text-teal-600 uppercase italic">${cita.hora}</p>
                                 <h3 class="font-bold text-slate-800 text-xs uppercase">${cita.nombre}</h3>
+                                <p class="text-[8px] text-slate-400 font-bold">${cita.telefono ? 'TEL: ' + cita.telefono : 'SIN TELÉFONO'}</p>
                             </div>
                             <div class="flex gap-2">
                                 <a href="${waLink}" target="_blank" class="bg-[#25D366] p-2.5 rounded-xl text-white">
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.396.933-.551.162-1.201.101-1.744-.268-.543-.36-1.548-1.134-2.126-1.73-.578-.596-1.181-1.44-1.212-2.012-.03-.572.254-1.178.669-1.51.416-.334.911-.348 1.201-.348.29 0 .537.014.756.044.219.03.491.069.722.519.231.45.779 1.897.848 2.04z"/></svg>
                                 </a>
-                                <button onclick="window.eliminarCita('${cita.id}')" class="bg-rose-100 p-2.5 rounded-xl text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                                <button onclick="window.eliminarCita('${cita.id}')" class="bg-rose-100 p-2.5 rounded-xl text-rose-500">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                             </div>
                         </div>`;
                 });
             }, (err) => {
-                container.innerHTML = `<p class="text-rose-500 text-[10px] font-bold">Error de conexión: Verifica Dominios Autorizados en Firebase.</p>`;
+                container.innerHTML = `<p class="text-rose-500 text-[10px] font-bold">Error de conexión.</p>`;
             });
         }
 
@@ -141,7 +138,6 @@
             if (confirm("¿Eliminar esta cita definitivamente?")) await deleteDoc(doc(db, "citas", id));
         };
 
-        // Inicio
         cargarDia(dateInput.value);
         dateInput.addEventListener('change', (e) => cargarDia(e.target.value));
     </script>
