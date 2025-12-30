@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="manifest" href="/manifest.json">
+    <title>CAP - Agenda</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(143deg) brightness(118%) contrast(119%); }
+        .animate-fade { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #installBanner { display: none; }
+    </style>
+</head>
+<body class="bg-[#F0FDFA] p-4 font-sans text-gray-800 pb-10">
+    
+    <div id="installBanner" class="max-w-md mx-auto mb-4 bg-teal-600 text-white p-4 rounded-2xl flex justify-between items-center shadow-lg animate-fade">
+        <div class="flex items-center gap-3">
+            <img src="Logo.png" class="w-10 h-10 rounded-lg shadow-sm" alt="CAP">
+            <div>
+                <p class="text-[11px] font-black uppercase tracking-tight">¿Deseas descargar la App?</p>
+                <p class="text-[9px] opacity-80">Instala CAP en tu pantalla de inicio</p>
+            </div>
+        </div>
+        <button id="btnInstall" class="bg-white text-teal-600 text-[10px] font-black px-4 py-2 rounded-full uppercase shadow-md active:scale-95 transition-transform">Instalar</button>
+    </div>
+
+    <div class="max-w-md mx-auto bg-white shadow-2xl rounded-[3rem] p-8 border border-teal-50 animate-fade">
+        
+        <div class="flex justify-center mb-6">
+            <video width="90" autoplay muted loop playsinline class="rounded-full shadow-lg border-4 border-teal-100">
+                <source src="Capagenda.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <header class="text-center mb-8">
+            <h1 class="text-2xl font-black text-teal-900 italic uppercase tracking-tighter">CAP</h1>
+            <p class="text-teal-600 font-medium text-[9px] uppercase tracking-[0.2em] mb-4">Centro de Atención Psicológica</p>
+            <div class="pt-4 border-t border-teal-50">
+                <h2 class="text-lg font-black text-teal-900 leading-tight">Dra. Gabriela Araujo Morales</h2>
+                <p class="text-[10px] text-teal-600 font-bold uppercase tracking-widest">Psicóloga Clínica</p>
+            </div>
+        </header>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block mb-2 text-[10px] font-black text-teal-800 uppercase tracking-widest text-center italic">Selecciona tu fecha</label>
+                <input type="date" id="datePicker" class="w-full p-4 bg-teal-50 border-none rounded-2xl focus:ring-2 focus:ring-teal-400 outline-none text-teal-900 font-bold text-center">
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                <h3 class="text-[9px] font-black text-teal-900 uppercase mb-2 tracking-tighter italic text-center">Políticas de Cita</h3>
+                <ul class="text-[8px] text-gray-500 space-y-1.5 leading-tight font-medium">
+                    <li>• <b>Reagendar:</b> Avisar con al menos <b>24 hrs</b> de anticipación.</li>
+                    <li>• <b>Emergencias:</b> En causas de fuerza mayor, avisar vía WhatsApp.</li>
+                    <li>• <b>Puntualidad:</b> Tolerancia máxima de <b>15 minutos</b>.</li>
+                    <li>• <b>Confirmación:</b> La cita se confirma al enviar el comprobante de pago.</li>
+                </ul>
+            </div>
+
+            <div id="slotsContainer" class="grid grid-cols-3 gap-2"></div>
+
+            <section id="paymentSection" class="hidden space-y-4 pt-6 border-t border-teal-50 animate-fade text-center">
+                <input type="text" id="patientName" placeholder="Escribe tu nombre completo" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold">
+                
+                <div class="bg-teal-50 p-5 rounded-[2rem] border border-teal-100">
+                    <p class="text-[10px] font-black text-teal-900 uppercase mb-4 tracking-tighter italic">Anticipo de Reserva: 50%</p>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-teal-50 cursor-pointer active:scale-95 transition-all shadow-sm" onclick="copyText('014346566889998268', 'c1')">
+                            <div class="text-left overflow-hidden">
+                                <p class="text-[7px] text-teal-400 uppercase font-bold tracking-widest leading-none mb-1">CLABE Santander</p>
+                                <p class="text-[11px] font-mono font-bold text-teal-900 italic">0143 4656 6889 9982 68</p>
+                            </div>
+                            <span id="c1" class="text-[8px] bg-teal-100 text-teal-700 p-1.5 px-3 rounded-lg font-bold uppercase">Copiar</span>
+                        </div>
+
+                        <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-teal-50 cursor-pointer active:scale-95 transition-all shadow-sm" onclick="copyText('5579100137652861', 'c2')">
+                            <div class="text-left overflow-hidden">
+                                <p class="text-[7px] text-teal-400 uppercase font-bold tracking-widest leading-none mb-1">Número de Tarjeta Santander</p>
+                                <p class="text-[11px] font-mono font-bold text-teal-900 italic">5579 1001 3765 2861</p>
+                            </div>
+                            <span id="c2" class="text-[8px] bg-teal-100 text-teal-700 p-1.5 px-3 rounded-lg font-bold uppercase">Copiar</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="window.guardarYEnviar()" class="w-full bg-teal-500 text-white font-black py-5 rounded-[2rem] shadow-xl active:scale-95 uppercase tracking-widest text-[10px] transition-all">
+                    Confirmar por WhatsApp
+                </button>
+            </section>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpuxAj2uxWgZw3eucgbDzLe22lQpLw53U",
+            authDomain: "agendacap-c03c7.firebaseapp.com",
+            projectId: "agendacap-c03c7",
+            storageBucket: "agendacap-c03c7.firebasestorage.app",
+            messagingSenderId: "39895419484",
+            appId: "1:39895419484:web:b7417e3e6ccd872febb499"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // MANEJO DE INSTALACIÓN PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').style.display = 'flex';
+        });
+
+        document.getElementById('btnInstall').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('installBanner').style.display = 'none';
+                deferredPrompt = null;
+            }
+        });
+
+        // RESTRICCIÓN DE FECHA MÍNIMA
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('datePicker').setAttribute('min', todayStr);
+
+        // CARGA DE HORARIOS DESDE FIREBASE
+        document.getElementById('datePicker').addEventListener('change', async (e) => {
+            const fecha = e.target.value;
+            const configDoc = await getDoc(doc(db, "configuracion", fecha));
+            const habilitados = configDoc.exists() ? configDoc.data().activos : [];
+
+            onSnapshot(query(collection(db, "citas"), where("fecha", "==", fecha)), (snap) => {
+                const ocupados = snap.docs.map(d => d.data().hora);
+                renderSlots(habilitados, ocupados);
+            });
+        });
+
+        function renderSlots(habilitados, ocupados) {
+            const container = document.getElementById('slotsContainer');
+            container.innerHTML = habilitados.length ? '' : '<p class="col-span-3 text-center text-[10px] text-gray-400 p-4 italic">No hay horarios disponibles.</p>';
+            
+            habilitados.forEach(hora => {
+                const isOcupado = ocupados.includes(hora);
+                const btn = document.createElement('button');
+                btn.innerText = isOcupado ? "Ocupado" : hora;
+                btn.disabled = isOcupado;
+                btn.className = isOcupado ? "p-3 bg-gray-50 text-gray-300 rounded-2xl text-[10px]" : "p-3 bg-white border border-teal-100 text-teal-700 rounded-2xl text-[10px] font-bold hover:bg-teal-500 hover:text-white transition-all active:scale-90 shadow-sm";
+                
+                if(!isOcupado) btn.onclick = () => {
+                    window.selectedTime = hora;
+                    document.querySelectorAll('#slotsContainer button').forEach(b => b.classList.remove('bg-teal-500', 'text-white'));
+                    btn.classList.add('bg-teal-500', 'text-white');
+                    document.getElementById('paymentSection').classList.remove('hidden');
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        // FUNCIÓN DE COPIAR TEXTO
+        window.copyText = (text, id) => {
+            navigator.clipboard.writeText(text);
+            const el = document.getElementById(id);
+            const originalText = el.innerText;
+            el.innerText = "¡OK!";
+            setTimeout(() => el.innerText = originalText, 2000);
+        };
+
+        // GUARDAR CITA Y ENVIAR WHATSAPP
+        window.guardarYEnviar = async () => {
+            const nombre = document.getElementById('patientName').value;
+            const fecha = document.getElementById('datePicker').value;
+            if(!nombre) return alert("Por favor escribe tu nombre");
+            
+            try {
+                await addDoc(collection(db, "citas"), { 
+                    nombre, 
+                    fecha, 
+                    hora: window.selectedTime, 
+                    pagado: false, 
+                    creado: new Date() 
+                });
+                const msg = `Hola Dra. Gabriela, soy ${nombre}. Agendé mi cita en CAP para el ${fecha} a las ${window.selectedTime}. Adjunto comprobante del 50%.`;
+                window.open(`https://wa.me/523313111626?text=${encodeURIComponent(msg)}`, '_blank');
+            } catch (e) {
+                alert("Error al guardar la cita. Intenta de nuevo.");
+            }
+        };
+
+        // REGISTRO DEL SERVICE WORKER
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js');
+            });
+        }
+    </script>
+</body>
+</html>
