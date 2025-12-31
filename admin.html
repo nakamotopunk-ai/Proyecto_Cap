@@ -64,16 +64,11 @@
         const offset = ahora.getTimezoneOffset() * 60000;
         dateInput.value = new Date(ahora - offset).toISOString().split('T')[0];
 
-        // Función para enviar recordatorios personalizados
         window.enviarRecordatorio = (tipo, nombre, telefono, hora) => {
-            if(!telefono || telefono.includes("undefined")) return alert("Esta cita no tiene teléfono registrado.");
-            
-            let mensaje = "";
-            if(tipo === '1h') {
-                mensaje = `Hola ${nombre}, te saludo de CAP. Te recordamos que tu cita con la Dra. Gabriela es en 1 HORA (${hora}). ¡Nos vemos pronto!`;
-            } else {
-                mensaje = `Hola ${nombre}, te saludo de CAP. Te recordamos tu cita con la Dra. Gabriela para MAÑANA a las ${hora}. ¿Nos confirmas tu asistencia?`;
-            }
+            if(!telefono) return alert("No hay teléfono registrado.");
+            let mensaje = tipo === '1h' ? 
+                `Hola ${nombre}, te recordamos que tu cita en CAP es en 1 HORA (${hora}).` : 
+                `Hola ${nombre}, te recordamos tu cita en CAP para MAÑANA a las ${hora}. ¿Confirmas asistencia?`;
             window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`, '_blank');
         };
 
@@ -92,47 +87,28 @@
                     container.innerHTML = '<div class="text-center py-10 text-slate-300 text-[10px] font-black uppercase italic">Sin citas</div>';
                     return;
                 }
-                
-                const docs = [];
-                snap.forEach(d => docs.push({id: d.id, ...d.data()}));
-                docs.sort((a, b) => a.hora.localeCompare(b.hora));
+                const docs = snap.docs.map(d => ({id: d.id, ...d.data()})).sort((a, b) => a.hora.localeCompare(b.hora));
 
                 docs.forEach(cita => {
-                    const telDestino = cita.telefono || ""; 
-                    
                     container.innerHTML += `
                         <div class="bg-white p-4 rounded-3xl border border-teal-100 shadow-md mb-3">
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <p class="text-[9px] font-black text-teal-600 uppercase italic">${cita.hora}</p>
-                                    <h3 class="font-bold text-slate-800 text-sm uppercase leading-none">${cita.nombre}</h3>
-                                    <p class="text-[8px] text-slate-400 mt-1 font-bold">${cita.telefono ? 'TEL: ' + cita.telefono : 'SIN TELÉFONO'}</p>
+                                    <h3 class="font-bold text-slate-800 text-sm uppercase">${cita.nombre}</h3>
+                                    <p class="text-[8px] text-slate-400 font-bold">${cita.telefono || 'SIN TELÉFONO'}</p>
                                 </div>
-                                <button onclick="window.eliminarCita('${cita.id}')" class="text-rose-300 hover:text-rose-500 transition-colors">
+                                <button onclick="window.eliminarCita('${cita.id}')" class="text-rose-300">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                             </div>
-                            
-                            <div class="grid grid-cols-3 gap-2 border-t border-slate-50 pt-3">
-                                <button onclick="window.enviarRecordatorio('24h', '${cita.nombre}', '${telDestino}', '${cita.hora}')" class="flex flex-col items-center justify-center bg-blue-50 p-2 rounded-xl text-blue-600 hover:bg-blue-100 transition-all">
-                                    <span class="text-[7px] font-black uppercase mb-1">Mañana</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                </button>
-                                
-                                <button onclick="window.enviarRecordatorio('1h', '${cita.nombre}', '${telDestino}', '${cita.hora}')" class="flex flex-col items-center justify-center bg-amber-50 p-2 rounded-xl text-amber-600 hover:bg-amber-100 transition-all">
-                                    <span class="text-[7px] font-black uppercase mb-1">1 Hora</span>
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                                </button>
-
-                                <a href="https://wa.me/${telDestino}" target="_blank" class="flex flex-col items-center justify-center bg-green-50 p-2 rounded-xl text-green-600 hover:bg-green-100 transition-all">
-                                    <span class="text-[7px] font-black uppercase mb-1">Chat</span>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766 0-3.18-2.587-5.771-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.396.933-.551.162-1.201.101-1.744-.268-.543-.36-1.548-1.134-2.126-1.73-.578-.596-1.181-1.44-1.212-2.012-.03-.572.254-1.178.669-1.51.416-.334.911-.348 1.201-.348.29 0 .537.014.756.044.219.03.491.069.722.519.231.45.779 1.897.848 2.04z"/></svg>
-                                </a>
+                            <div class="grid grid-cols-3 gap-2 border-t pt-3">
+                                <button onclick="window.enviarRecordatorio('24h', '${cita.nombre}', '${cita.telefono}', '${cita.hora}')" class="bg-blue-50 p-2 rounded-xl text-blue-600 text-[7px] font-black uppercase">Mañana</button>
+                                <button onclick="window.enviarRecordatorio('1h', '${cita.nombre}', '${cita.telefono}', '${cita.hora}')" class="bg-amber-50 p-2 rounded-xl text-amber-600 text-[7px] font-black uppercase">1 Hora</button>
+                                <a href="https://wa.me/${cita.telefono}" target="_blank" class="bg-green-50 p-2 rounded-xl text-green-600 text-[7px] font-black uppercase text-center">Chat</a>
                             </div>
                         </div>`;
                 });
-            }, (err) => {
-                container.innerHTML = `<p class="text-rose-500 text-[10px] font-bold">Error de conexión.</p>`;
             });
         }
 
@@ -143,7 +119,7 @@
                 const isActive = horasSeleccionadas.includes(hora);
                 const btn = document.createElement('button');
                 btn.innerText = hora;
-                btn.className = `p-3 rounded-xl text-[10px] font-bold transition-all ${isActive ? 'bg-teal-500 text-white shadow-md' : 'bg-slate-100 text-slate-400 border border-slate-200'}`;
+                btn.className = `p-3 rounded-xl text-[10px] font-bold ${isActive ? 'bg-teal-500 text-white shadow-md' : 'bg-slate-100 text-slate-400'}`;
                 btn.onclick = () => {
                     if (horasSeleccionadas.includes(hora)) horasSeleccionadas = horasSeleccionadas.filter(h => h !== hora);
                     else horasSeleccionadas.push(hora);
@@ -160,7 +136,7 @@
         };
 
         window.eliminarCita = async (id) => {
-            if (confirm("¿Eliminar esta cita definitivamente?")) await deleteDoc(doc(db, "citas", id));
+            if (confirm("¿Eliminar cita?")) await deleteDoc(doc(db, "citas", id));
         };
 
         cargarDia(dateInput.value);
