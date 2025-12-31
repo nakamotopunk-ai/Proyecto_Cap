@@ -10,22 +10,11 @@
         input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(143deg) brightness(118%) contrast(119%); }
         .animate-fade { animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        #installBanner { display: none; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
     </style>
 </head>
 <body class="bg-[#F0FDFA] p-4 font-sans text-gray-800 pb-10">
     
-    <div id="installBanner" class="max-w-md mx-auto mb-4 bg-teal-600 text-white p-4 rounded-2xl flex justify-between items-center shadow-lg animate-fade">
-        <div class="flex items-center gap-3">
-            <img src="Logo.png" class="w-10 h-10 rounded-lg shadow-sm" alt="CAP">
-            <div>
-                <p class="text-[11px] font-black uppercase tracking-tight">¿Deseas descargar la App?</p>
-                <p class="text-[9px] opacity-80">Instala CAP en tu pantalla de inicio</p>
-            </div>
-        </div>
-        <button id="btnInstall" class="bg-white text-teal-600 text-[10px] font-black px-4 py-2 rounded-full uppercase shadow-md active:scale-95 transition-transform">Instalar</button>
-    </div>
-
     <div class="max-w-md mx-auto bg-white shadow-2xl rounded-[3rem] p-8 border border-teal-50 animate-fade">
         <div class="flex justify-center mb-6">
             <video width="90" autoplay muted loop playsinline class="rounded-full shadow-lg border-4 border-teal-100">
@@ -54,21 +43,46 @@
                 <input type="text" id="patientName" placeholder="Escribe tu nombre completo" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold mb-2">
                 <input type="tel" id="patientPhone" placeholder="WhatsApp (10 dígitos)" maxlength="10" class="w-full p-4 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-teal-400 text-center font-semibold">
                 
-                <div class="bg-teal-50 p-5 rounded-[2rem] border border-teal-100">
-                    <p class="text-[10px] font-black text-teal-900 uppercase mb-4 tracking-tighter italic">Anticipo de Reserva: 50%</p>
-                    <div class="space-y-3">
-                        <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-teal-50 cursor-pointer active:scale-95 transition-all shadow-sm" onclick="copyText('014346566889998268', 'c1')">
-                            <div class="text-left overflow-hidden">
-                                <p class="text-[7px] text-teal-400 uppercase font-bold tracking-widest leading-none mb-1">CLABE Santander</p>
-                                <p class="text-[11px] font-mono font-bold text-teal-900 italic">0143 4656 6889 9982 68</p>
+                <div class="bg-teal-50 p-6 rounded-[2.5rem] border border-teal-100 mt-4 text-left">
+                    <p class="text-[10px] font-black text-teal-900 uppercase mb-3 tracking-tighter italic text-center underline decoration-teal-300">Políticas de Reserva</p>
+                    
+                    <ul class="space-y-2 mb-4">
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-500 text-[10px]">●</span>
+                            <p class="text-[9px] text-teal-800 leading-tight">Para confirmar tu espacio, se requiere un <b>anticipo del 50%</b> de la sesión.</p>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-500 text-[10px]">●</span>
+                            <p class="text-[9px] text-teal-800 leading-tight">En caso de cancelación, agradecemos <b>avisar con 24 horas de anticipación</b> para conservar tu anticipo.</p>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-teal-500 text-[10px]">●</span>
+                            <p class="text-[9px] text-teal-800 leading-tight">Contamos con una <b>tolerancia de 15 minutos</b> por respeto al horario de todos los pacientes.</p>
+                        </li>
+                    </ul>
+
+                    <div class="space-y-2 pt-2 border-t border-teal-100">
+                        <div class="bg-white p-3 rounded-2xl border border-teal-50 shadow-sm flex justify-between items-center">
+                            <div>
+                                <p class="text-[7px] text-teal-400 font-black uppercase tracking-widest">CLABE Santander</p>
+                                <p class="text-[10px] font-mono font-bold text-teal-900">0143 4656 6889 9982 68</p>
                             </div>
-                            <span id="c1" class="text-[8px] bg-teal-100 text-teal-700 p-1.5 px-3 rounded-lg font-bold uppercase">Copiar</span>
+                            <button onclick="window.copyText('014346566889998268')" class="text-[7px] bg-teal-50 text-teal-700 px-3 py-1.5 rounded-full font-black uppercase active:scale-95">Copiar</button>
+                        </div>
+                        <div class="bg-white p-3 rounded-2xl border border-teal-50 shadow-sm flex justify-between items-center">
+                            <div>
+                                <p class="text-[7px] text-teal-400 font-black uppercase tracking-widest">Cuenta Santander</p>
+                                <p class="text-[10px] font-mono font-bold text-teal-900">5668 8999 826</p>
+                            </div>
+                            <button onclick="window.copyText('56688999826')" class="text-[7px] bg-teal-50 text-teal-700 px-3 py-1.5 rounded-full font-black uppercase active:scale-95">Copiar</button>
                         </div>
                     </div>
+                    
+                    <p class="text-[8px] text-slate-400 mt-4 italic text-center font-bold">Favor de enviar tu comprobante al WhatsApp para finalizar el registro.</p>
                 </div>
                 
                 <button onclick="window.guardarYEnviar()" class="w-full bg-teal-500 text-white font-black py-5 rounded-[2rem] shadow-xl active:scale-95 uppercase tracking-widest text-[10px] transition-all">
-                    Confirmar por WhatsApp
+                    Confirmar y Agendar
                 </button>
             </section>
         </div>
@@ -93,6 +107,10 @@
         const todayStr = new Date().toISOString().split('T')[0];
         document.getElementById('datePicker').setAttribute('min', todayStr);
 
+        window.copyText = (text) => {
+            navigator.clipboard.writeText(text).then(() => alert("Copiado al portapapeles"));
+        };
+
         document.getElementById('datePicker').addEventListener('change', async (e) => {
             const fecha = e.target.value;
             const configDoc = await getDoc(doc(db, "configuracion", fecha));
@@ -113,7 +131,7 @@
                 const btn = document.createElement('button');
                 btn.innerText = isOcupado ? "Ocupado" : hora;
                 btn.disabled = isOcupado;
-                btn.className = isOcupado ? "p-3 bg-gray-50 text-gray-300 rounded-2xl text-[10px]" : "p-3 bg-white border border-teal-100 text-teal-700 rounded-2xl text-[10px] font-bold hover:bg-teal-500 hover:text-white transition-all active:scale-90 shadow-sm";
+                btn.className = isOcupado ? "p-3 bg-gray-50 text-gray-300 rounded-2xl text-[10px]" : "p-3 bg-white border border-teal-100 text-teal-700 rounded-2xl text-[10px] font-bold shadow-sm active:scale-95";
                 
                 if(!isOcupado) btn.onclick = () => {
                     window.selectedTime = hora;
@@ -126,11 +144,11 @@
         }
 
         window.guardarYEnviar = async () => {
-            const nombre = document.getElementById('patientName').value;
-            const telefono = document.getElementById('patientPhone').value;
+            const nombre = document.getElementById('patientName').value.trim();
+            const telefono = document.getElementById('patientPhone').value.trim();
             const fecha = document.getElementById('datePicker').value;
 
-            if(!nombre || telefono.length !== 10) return alert("Completa tu nombre y teléfono (10 dígitos)");
+            if(!nombre || telefono.length !== 10) return alert("Ingresa tu nombre y WhatsApp de 10 dígitos");
             
             try {
                 await addDoc(collection(db, "citas"), { 
@@ -141,7 +159,7 @@
                     pagado: false, 
                     creado: new Date() 
                 });
-                const msg = `Hola Dra. Gabriela, soy ${nombre}. Agendé mi cita en CAP para el ${fecha} a las ${window.selectedTime}. Mi WhatsApp es ${telefono}.`;
+                const msg = `Hola Dra. Gabriela, soy ${nombre}. Agendé mi cita en CAP el ${fecha} a las ${window.selectedTime}. Quedo pendiente de enviar mi comprobante.`;
                 window.open(`https://wa.me/523313111626?text=${encodeURIComponent(msg)}`, '_blank');
             } catch (e) {
                 alert("Error al guardar.");
